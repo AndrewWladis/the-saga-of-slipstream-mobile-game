@@ -1,10 +1,13 @@
 import { Pressable, ScrollView, Text, View } from 'react-native';
 
+import { LEVELS } from '../constants/levels';
 import { styles } from '../styles';
 
-const LEVEL_COUNT = 8;
-
-export default function LevelSelectScreen({ onGoHome, onSelectLevel }) {
+export default function LevelSelectScreen({
+  maxUnlockedLevel,
+  onGoHome,
+  onSelectLevel,
+}) {
   return (
     <View style={styles.levelSelectRoot}>
       <Pressable onPress={onGoHome} style={styles.backBtn} hitSlop={12}>
@@ -16,12 +19,12 @@ export default function LevelSelectScreen({ onGoHome, onSelectLevel }) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.levelSelectGrid}>
-          {Array.from({ length: LEVEL_COUNT }, (_, i) => {
+          {LEVELS.map((title, i) => {
             const n = i + 1;
-            const unlocked = n === 1;
+            const unlocked = n <= maxUnlockedLevel;
             return (
               <Pressable
-                key={n}
+                key={title}
                 onPress={() => onSelectLevel(n)}
                 style={({ pressed }) => [
                   styles.levelSelectCell,
@@ -34,11 +37,11 @@ export default function LevelSelectScreen({ onGoHome, onSelectLevel }) {
               >
                 <Text
                   style={[
-                    styles.levelSelectNumber,
-                    !unlocked && styles.levelSelectNumberLocked,
+                    styles.levelSelectChapterTitle,
+                    !unlocked && styles.levelSelectChapterTitleLocked,
                   ]}
                 >
-                  {n}
+                  {title}
                 </Text>
                 {!unlocked && (
                   <Text style={styles.levelSelectLockLabel}>Locked</Text>

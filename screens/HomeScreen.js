@@ -63,6 +63,7 @@ export default function HomeScreen({ fontError, onGoToLevels }) {
         >
           The Saga of Slipstream
         </Animated.Text>
+        <Text style={styles.homeSubtitle}>Intergalactic Superhero</Text>
         <Pressable
           onPress={onGoToLevels}
           style={({ pressed }) => [

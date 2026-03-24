@@ -12,9 +12,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import Starfield from './components/Starfield';
+import { LEVEL_COUNT } from './constants/levels';
 import GameScreen from './screens/GameScreen';
 import HomeScreen from './screens/HomeScreen';
 import LevelSelectScreen from './screens/LevelSelectScreen';
+import { loadMaxUnlockedLevel } from './storage/progress';
 import { styles } from './styles';
 
 SplashScreen.preventAutoHideAsync();
@@ -22,6 +24,7 @@ SplashScreen.preventAutoHideAsync();
 const SLIDE_PAD = 56;
 const DURATION_SLIDE = 520;
 const DURATION_FADE = 560;
+const FLASH_FADE_IN_MS = 280;
 
 export default function App() {
   const { height: windowHeight } = useWindowDimensions();
@@ -30,17 +33,39 @@ export default function App() {
   });
   const [screen, setScreen] = useState('home');
   const [transition, setTransition] = useState(null);
+  const [maxUnlockedLevel, setMaxUnlockedLevel] = useState(1);
   const [activeLevel, setActiveLevel] = useState(null);
+  const [flashActive, setFlashActive] = useState(false);
 
   const homeY = useRef(new Animated.Value(0)).current;
   const levelsOpacity = useRef(new Animated.Value(0)).current;
+  const flashOpacity = useRef(new Animated.Value(0)).current;
   const busyRef = useRef(false);
+  const flashAnimRef = useRef(null);
 
   useEffect(() => {
     if (fontsLoaded || fontError) {
       SplashScreen.hideAsync();
     }
   }, [fontsLoaded, fontError]);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadMaxUnlockedLevel().then((value) => {
+      if (!cancelled) {
+        setMaxUnlockedLevel(value);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      flashAnimRef.current?.stop();
+    };
+  }, []);
 
   if (!fontsLoaded && !fontError) {
     return <View style={styles.safe} />;
@@ -119,23 +144,54 @@ export default function App() {
   };
 
   const startLevel = (level) => {
-    if (level !== 1) return;
-    setActiveLevel(level);
-    setScreen('game');
+    if (
+      level < 1 ||
+      level > LEVEL_COUNT ||
+      level > maxUnlockedLevel
+    ) {
+      return;
+    }
+    if (flashActive) {
+      return;
+    }
+    flashAnimRef.current?.stop();
+    setFlashActive(true);
+    flashOpacity.setValue(0);
+    flashAnimRef.current = Animated.timing(flashOpacity, {
+      toValue: 1,
+      duration: FLASH_FADE_IN_MS,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    });
+    flashAnimRef.current.start(({ finished }) => {
+      flashAnimRef.current = null;
+      if (!finished) {
+        setFlashActive(false);
+        flashOpacity.setValue(0);
+        return;
+      }
+      setActiveLevel(level);
+      setScreen('game');
+      setFlashActive(false);
+      flashOpacity.setValue(0);
+    });
   };
 
-  if (screen === 'game') {
+  if (screen === 'game' && activeLevel != null) {
     return (
-      <GameScreen activeLevel={activeLevel} onLeave={leaveGame} />
+      <GameScreen level={activeLevel} onLeave={leaveGame} />
     );
   }
 
   return (
     <SafeAreaView style={styles.safe}>
-      <View
-        style={styles.shellInner}
-        pointerEvents={transition ? 'none' : 'auto'}
-      >
+      <View style={{ flex: 1, position: 'relative' }}>
+        <View
+          style={styles.shellInner}
+          pointerEvents={
+            transition || flashActive ? 'none' : 'auto'
+          }
+        >
         <StatusBar style="light" />
         <View
           pointerEvents="none"
@@ -151,6 +207,7 @@ export default function App() {
             ]}
           >
             <LevelSelectScreen
+              maxUnlockedLevel={maxUnlockedLevel}
               onGoHome={goHome}
               onSelectLevel={startLevel}
             />
@@ -170,6 +227,18 @@ export default function App() {
             />
           </Animated.View>
         )}
+        </View>
+        <Animated.View
+          pointerEvents={flashActive ? 'auto' : 'none'}
+          style={[
+            StyleSheet.absoluteFillObject,
+            {
+              backgroundColor: '#ffffff',
+              opacity: flashOpacity,
+              zIndex: 9999,
+            },
+          ]}
+        />
       </View>
     </SafeAreaView>
   );

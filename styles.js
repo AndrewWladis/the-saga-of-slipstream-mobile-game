@@ -36,9 +36,18 @@ export const styles = StyleSheet.create({
     fontSize: 89,
     textAlign: 'center',
     letterSpacing: 0.5,
-    marginBottom: 32,
     paddingHorizontal: 16,
     textShadowOffset: { width: 0, height: 0 },
+  },
+  homeSubtitle: {
+    color: '#9eb6d4',
+    fontSize: 19,
+    fontWeight: '600',
+    letterSpacing: 2.5,
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    marginBottom: 36,
+    paddingHorizontal: 20,
   },
   homeLogoFallback: {
     fontWeight: '700',
@@ -107,18 +116,20 @@ export const styles = StyleSheet.create({
   },
   levelSelectScroll: {
     paddingBottom: 32,
+    flexGrow: 1,
+    alignSelf: 'stretch',
+    width: '100%',
   },
   levelSelectGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: 14,
+    flexDirection: 'column',
+    alignSelf: 'stretch',
+    width: '100%',
+    gap: 12,
   },
   levelSelectCell: {
-    width: '28%',
-    minWidth: 96,
-    aspectRatio: 1,
-    maxWidth: 120,
+    width: '100%',
+    paddingVertical: 16,
+    paddingHorizontal: 18,
     borderRadius: 12,
     borderWidth: 1,
     alignItems: 'center',
@@ -136,12 +147,14 @@ export const styles = StyleSheet.create({
   levelSelectPressed: {
     backgroundColor: '#252525',
   },
-  levelSelectNumber: {
+  levelSelectChapterTitle: {
     color: '#fff',
-    fontSize: 28,
+    fontSize: 17,
     fontWeight: '600',
+    textAlign: 'center',
+    lineHeight: 24,
   },
-  levelSelectNumberLocked: {
+  levelSelectChapterTitleLocked: {
     color: '#555',
   },
   levelSelectLockLabel: {
@@ -152,25 +165,114 @@ export const styles = StyleSheet.create({
     letterSpacing: 0.8,
   },
 
-  gameRoot: {
+  gameShell: {
     flex: 1,
-    backgroundColor: '#000',
-    paddingHorizontal: 20,
+    backgroundColor: '#c8c8c8',
   },
-  gameBody: {
+  gameBackBtn: {
+    position: 'absolute',
+    top: 8,
+    left: 10,
+    zIndex: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 6,
+  },
+  gameBackBtnText: {
+    color: '#333',
+    fontSize: 17,
+    fontWeight: '600',
+  },
+  gameFrame: {
+    flex: 1,
+    marginHorizontal: 14,
+    marginTop: 15,
+    marginBottom: 14,
+    gap: 10,
+  },
+  gameCharacterPanel: {
+    flex: 7,
+    minHeight: 120,
+    backgroundColor: '#ffffff',
+    borderWidth: 2,
+    borderColor: '#a8a8a8',
+  },
+  gameCharacterViewport: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    padding: 12,
   },
-  gameTitle: {
-    color: '#f5f5f5',
-    fontSize: 22,
+  gameCharacterLabel: {
+    color: '#9a9a9a',
+    fontSize: 16,
     fontWeight: '600',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
-  gameHint: {
-    color: '#777',
-    fontSize: 15,
+  gameConsoleRow: {
+    flex: 3,
+    minHeight: 108,
+    maxHeight: 200,
+    flexDirection: 'row',
+    borderWidth: 2,
+    borderColor: '#a8a8a8',
+    overflow: 'hidden',
+    marginBottom: 30,
+  },
+  gameConsoleIconSlot: {
+    width: 96,
+    backgroundColor: '#a5d980',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRightWidth: 2,
+    borderColor: '#a8a8a8',
+  },
+  gameConsoleDialogue: {
+    flex: 1,
+    backgroundColor: '#a5d980',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+  },
+  gameConsoleDialoguePressed: {
+    opacity: 0.88,
+  },
+  gameConsoleDialogueHint: {
     marginTop: 12,
-    textAlign: 'center',
+    fontSize: 12,
+    fontWeight: '600',
+    letterSpacing: 1,
+    color: '#0a1608',
+    opacity: 0.55,
+    ...Platform.select({
+      ios: {
+        fontFamily: 'Menlo',
+      },
+      android: {
+        fontFamily: 'monospace',
+      },
+      default: {
+        fontFamily: 'monospace',
+      },
+    }),
+  },
+  gameConsoleDialogueText: {
+    color: '#0a1608',
+    fontSize: 19,
+    fontWeight: '600',
+    letterSpacing: 1.2,
+    fontVariant: ['tabular-nums'],
+    ...Platform.select({
+      ios: {
+        fontFamily: 'Menlo',
+      },
+      android: {
+        fontFamily: 'monospace',
+      },
+      default: {
+        fontFamily: 'monospace',
+      },
+    }),
   },
 });
